@@ -10,7 +10,7 @@
 Here's a non-trivial query to give you an idea of what this style guide looks like in the practice:
 
 ```sql
-with hubspot_interest as (
+with hubspot_interest AS (
 
    SELECT
         email,
@@ -25,7 +25,7 @@ support_interest AS (
 
     SELECT
         conversation.email,
-        conversation.created_at as expressed_interest_at
+        conversation.created_at AS expressed_interest_at
    FROM helpscout.conversation
     INNER JOIN helpscout.conversation_tag on conversation.id = conversation_tag.conversation_id
     WHERE
@@ -33,7 +33,7 @@ support_interest AS (
 
 ), 
 
-combined_interest as (
+combined_interest AS (
 
     SELECT * FROM hubspot_interest
     UNION ALL
@@ -126,7 +126,7 @@ WHERE
 SELECT *
 FROM users
 WHERE 
-    email like '%@domain.com' and 
+    email LIKE '%@domain.com' AND 
     created_at >= '2021-10-08'
 
 -- Bad
