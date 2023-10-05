@@ -41,7 +41,7 @@ combined_interest AS (
 
 ),
 
-first_interest as (
+first_interest AS (
 
     SELECT
         email,
