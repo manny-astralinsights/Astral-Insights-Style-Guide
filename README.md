@@ -3,13 +3,7 @@
 
 #  SQL Style Guide
 
-Howdy! I'm [Matt Mazur](https://mattmazur.com/) and I'm a data analyst who has worked at several startups to help them use data to grow their businesses. This guide is an attempt to document my preferences for formatting SQL in the hope that it may be of some use to others. If you or your team do not already have a SQL style guide, this may serve as a good starting point which you can adopt and update based on your preferences. 
 
-Also, I'm a strong believer in having [Strong Opinions, Weakly Held](https://medium.com/@ameet/strong-opinions-weakly-held-a-framework-for-thinking-6530d417e364) so if you disagree with any of this, [drop me a note](https://mattmazur.com/contact/), I'd love to discuss it.
-
-If you're interested in this topic, you may also enjoy my [LookML Style Guide](https://github.com/mattm/lookml-style-guide) or my [blog](https://mattmazur.com/category/analytics/) where I write about analytics and data analysis.
-
-Simplified Chinese version here: [中文版](https://github.com/huangxinping/sql-style-guide/blob/zh-cn/README.md)
 
 ## Example
 
@@ -18,59 +12,59 @@ Here's a non-trivial query to give you an idea of what this style guide looks li
 ```sql
 with hubspot_interest as (
 
-    select
+   SELECT
         email,
-        timestamp_millis(property_beacon_interest) as expressed_interest_at
-    from hubspot.contact
-    where 
+        timestamp_millis(property_beacon_interest) AS expressed_interest_at
+    FROM hubspot.contact
+    WHERE
         property_beacon_interest is not null
 
 ), 
 
-support_interest as (
+support_interest AS (
 
-    select 
+    SELECT
         conversation.email,
         conversation.created_at as expressed_interest_at
-    from helpscout.conversation
-    inner join helpscout.conversation_tag on conversation.id = conversation_tag.conversation_id
-    where 
+   FROM helpscout.conversation
+    INNER JOIN helpscout.conversation_tag on conversation.id = conversation_tag.conversation_id
+    WHERE
         conversation_tag.tag = 'beacon-interest'
 
 ), 
 
 combined_interest as (
 
-    select * from hubspot_interest
-    union all
-    select * from support_interest
+    SELECT * FROM hubspot_interest
+    UNION ALL
+    SELECT * FROM support_interest
 
 ),
 
 first_interest as (
 
-    select 
+    SELECT
         email,
-        min(expressed_interest_at) as expressed_interest_at
-    from combined_interest
-    group by email
+        MIN(expressed_interest_at) as expressed_interest_at
+   FROM combined_interest
+   GROUP BY email
 
 )
 
-select * from first_interest
+SELECT * FROM first_interest
 ```
 ## Guidelines
 
-### Use lowercase SQL
+### Use Uppercase SQL
 
 It's just as readable as uppercase SQL and you won't have to constantly be holding down a shift key.
 
 ```sql
 -- Good
-select * from users
+SELECT * FROM users
 
 -- Bad
-SELECT * FROM users
+select * from users
 
 -- Bad
 Select * From users
@@ -82,23 +76,23 @@ When selecting columns, always put each column name on its own line and never on
 
 ```sql
 -- Good
-select 
+SELECT
     id
-from users 
+FROM users 
 
 -- Good
-select 
+SELECT 
     id,
     email
-from users 
+FROM users 
 
 -- Bad
-select id
-from users 
+SELECT id
+FROM users 
 
 -- Bad
-select id, email
-from users 
+SELECT id, email
+FROM users 
 ```
 
 ## select *
@@ -107,11 +101,11 @@ When selecting `*` it's fine to include the `*` next to the `select` and also fi
 
 ```sql
 -- Good
-select * from users 
+SELECT * FROM users 
 
 -- Good too
-select *
-from users
+SELECT *
+FROM users
 
 -- Bad
 select * from users where email = 'name@example.com'
@@ -123,15 +117,15 @@ Similarly, conditions should always be spread across multiple lines to maximize 
 
 ```sql
 -- Good
-select *
-from users
-where 
+SELECT *
+FROM users
+WHERE
     email = 'example@domain.com'
 
 -- Good
-select *
-from users
-where 
+SELECT *
+FROM users
+WHERE 
     email like '%@domain.com' and 
     created_at >= '2021-10-08'
 
@@ -160,11 +154,11 @@ Some IDEs have the ability to automatically format SQL so that the spaces after 
 
 ```sql
 -- Good
-select 
+SELECT 
     id,
     email
-from users
-where 
+FROM users
+WHERE 
     email like '%@gmail.com'
 
 -- Bad
@@ -179,9 +173,9 @@ Some SQL dialects like BigQuery support using double quotes, but for most dialec
 
 ```sql
 -- Good
-select *
-from users
-where 
+SELECT *
+FROM users
+WHERE 
     email = 'example@domain.com'
 
 -- Bad
@@ -193,27 +187,16 @@ where
 
 If your SQL dialect supports double quoted strings and you prefer them, just make sure to be consistent and not switch between single and double quotes.
 
-### Use `!=` over `<>`
 
-Simply because `!=` reads like "not equal" which is closer to how we'd say it out loud.
-
-```sql
--- Good
-select 
-    count(*) as paying_users_count
-from users
-where 
-    plan_name != 'free'
-```
 
 ### Commas should be at the the end of lines
 
 ```sql
 -- Good
-select
+SELECT
     id,
     email
-from users
+FROM users
 
 -- Bad
 select
@@ -228,9 +211,9 @@ While the commas-first style does have some practical advantages (it's easier to
 
 ```sql
 -- Good
-select *
-from users
-where 
+SELECT *
+FROM users
+WHERE 
     id in (1, 2)
 
 -- Bad
@@ -244,10 +227,10 @@ where
 
 ```sql
 -- Good
-select *
-from users
-where 
-    email in (
+SELECT *
+FROM users
+WHERE
+    email IN (
         'user-1@example.com',
         'user-2@example.com',
         'user-3@example.com',
@@ -259,12 +242,12 @@ where
 
 ```sql
 -- Good
-select * 
-from users
+SELECT * 
+FROM users
 
 -- Good
-select * 
-from visit_logs
+SELECT * 
+FROM visit_logs
 
 -- Bad
 select * 
@@ -279,11 +262,11 @@ from visitLog
 
 ```sql
 -- Good
-select
+SELECT
     id,
     email,
     timestamp_trunc(created_at, month) as signup_month
-from users
+FROM users
 
 -- Bad
 select
@@ -305,11 +288,11 @@ Put the primary key first, followed by foreign keys, then by all other columns. 
 
 ```sql
 -- Good
-select
+SELECT
     id,
     name,
     created_at
-from users
+FROM users
 
 -- Bad
 select
@@ -325,11 +308,11 @@ Better to be explicit so that the join type is crystal clear:
 
 ```sql
 -- Good
-select
+SELECT
     users.email,
-    sum(charges.amount) as total_revenue
-from users
-inner join charges on users.id = charges.user_id
+    SUM(charges.amount) AS total_revenue
+FROM users
+INNER JOIN charges ON users.id = charges.user_id
 
 -- Bad
 select
@@ -345,10 +328,10 @@ By doing it this way it makes it easier to determine if your join is going to ca
 
 ```sql
 -- Good
-select
+SELECT
     ...
-from users
-left join charges on users.id = charges.user_id
+FROM users
+LEFT JOIN charges ON users.id = charges.user_id
 -- primary_key = foreign_key --> one-to-many --> fanout
   
 select
@@ -368,12 +351,12 @@ left join charges on charges.user_id = users.id
 
 ```sql
 -- Good
-select
+SELECT
     users.email,
-    sum(charges.amount) as total_revenue
-from users
-inner join charges on users.id = charges.user_id
-group by email
+    SUN(charges.amount) AS total_revenue
+FROM users
+INNER JOIN charges ON users.id = charges.user_id
+GROUP BY email
 
 -- Bad
 select
@@ -389,14 +372,14 @@ When you have mutliple join conditions, place each one on their own indented lin
 
 ```sql
 -- Good
-select
+SELECT
     users.email,
-    sum(charges.amount) as total_revenue
-from users
-inner join charges on 
+    SUM(charges.amount) AS total_revenue
+FROM users
+INNER JOIN charges ON 
     users.id = charges.user_id and
     refunded = false
-group by email
+GROUP BY email
 ```
 
 ### Avoid aliasing table names most of the time
@@ -405,11 +388,11 @@ It can be tempting to abbreviate table names like `users` to `u` and `charges` t
 
 ```sql
 -- Good
-select
+SELECT
     users.email,
-    sum(charges.amount) as total_revenue
-from users
-inner join charges on users.id = charges.user_id
+    SUM(charges.amount) AS total_revenue
+FROM users
+INNER JOIN charges ON users.id = charges.user_id
 
 -- Bad
 select
@@ -429,18 +412,18 @@ Also, if you're working with long or ambiguous table names, it can be useful to 
 
 ```sql
 -- Good: Meaningful table aliases
-select
+SELECT
   companies.com_name,
   beacons.created_at
-from stg_mysql_helpscout__helpscout_companies companies
-inner join stg_mysql_helpscout__helpscout_beacons_v2 beacons on companies.com_id = beacons.com_id
+FROM stg_mysql_helpscout__helpscout_companies companies
+INNER JOIN stg_mysql_helpscout__helpscout_beacons_v2 beacons ON companies.com_id = beacons.com_id
 
 -- OK: No table aliases
-select
+SELECT
   stg_mysql_helpscout__helpscout_companies.com_name,
   stg_mysql_helpscout__helpscout_beacons_v2.created_at
-from stg_mysql_helpscout__helpscout_companies
-inner join stg_mysql_helpscout__helpscout_beacons_v2 on stg_mysql_helpscout__helpscout_companies.com_id = stg_mysql_helpscout__helpscout_beacons_v2.com_id
+FROM stg_mysql_helpscout__helpscout_companies
+INNER JOIN stg_mysql_helpscout__helpscout_beacons_v2 on stg_mysql_helpscout__helpscout_companies.com_id = stg_mysql_helpscout__helpscout_beacons_v2.com_id
 
 -- Bad: Unclear table aliases
 select
@@ -456,10 +439,10 @@ When there are no join involved, there's no ambiguity around which table the col
 
 ```sql
 -- Good
-select
+SELECT
     id,
     name
-from companies
+FROM companies
 
 -- Bad
 select
@@ -472,11 +455,11 @@ But when there are joins involved, it's better to be explicit so it's clear wher
 
 ```sql
 -- Good
-select
+SELECT
     users.email,
     sum(charges.amount) as total_revenue
-from users
-inner join charges on users.id = charges.user_id
+FROM users
+INNER JOIN charges on users.id = charges.user_id
 
 -- Bad
 select
@@ -491,9 +474,9 @@ inner join charges on users.id = charges.user_id
 
 ```sql
 -- Good
-select 
-    count(*) as total_users
-from users
+SELECT 
+    COUNT(*) AS total_users
+FROM users
 
 -- Bad
 select 
@@ -501,11 +484,11 @@ select
 from users
 
 -- Good
-select 
-    timestamp_millis(property_beacon_interest) as expressed_interest_at
-from hubspot.contact
-where 
-    property_beacon_interest is not null
+SELECT 
+    timestamp_millis(property_beacon_interest) AS expressed_interest_at
+FROM hubspot.contact
+WHERE 
+    property_beacon_interest IS NOT NULL
 
 -- Bad
 select
@@ -519,16 +502,16 @@ where
 
 ```sql
 -- Good
-select * 
-from customers 
-where 
-    is_cancelled = true
+SELECT * 
+FROM customers 
+WHERE 
+    is_cancelled = TRUE
 
 -- Good
-select * 
-from customers 
-where 
-    is_cancelled = false
+SELECT * 
+FROM customers 
+WHERE 
+    is_cancelled = FALSE
 
 -- Bad
 select * 
@@ -547,11 +530,11 @@ where
 
 ```sql
 -- Good
-select
+SELECT
     id,
     email,
-    timestamp_trunc(created_at, month) as signup_month
-from users
+    timestamp_trunc(created_at, month) AS signup_month
+FROM users
 
 -- Bad
 select
@@ -567,18 +550,18 @@ I prefer grouping by name, but grouping by numbers is [also fine](https://blog.g
 
 ```sql
 -- Good
-select 
+SELECT 
     user_id, 
     count(*) as total_charges
-from charges
-group by user_id
+FROM charges
+GROUP BY user_id
 
 -- Good
-select 
+SELECT 
     user_id, 
     count(*) as total_charges
-from charges
-group by 1
+FROM charges
+GROUP BY 1
 
 -- Bad
 select
@@ -593,11 +576,11 @@ group by 1, vertical
 
 ```sql
 -- Good
-select
-  timestamp_trunc(com_created_at, year) as signup_year,
-  count(*) as total_companies
-from companies
-group by signup_year
+SELECT
+  timestamp_trunc(com_created_at, year) AS signup_year,
+  COUNT(*) as total_companies
+FROM companies
+GROUP BY signup_year
 
 -- Bad
 select
@@ -611,11 +594,11 @@ group by timestamp_trunc(com_created_at, year)
 
 ```sql
 -- Good
-select
+SELECT
   timestamp_trunc(com_created_at, year) as signup_year,
   count(*) as total_companies
-from companies
-group by signup_year
+FROM companies
+GROUP BY signup_year
 
 -- Bad
 select
@@ -631,24 +614,24 @@ Each `when` should be on its own line (nothing on the `case` line) and should be
 
 ```sql
 -- Good
-select
-    case
-        when event_name = 'viewed_homepage' then 'Homepage'
-        when event_name = 'viewed_editor' then 'Editor'
-        else 'Other'
-    end as page_name
-from events
+SELECT
+    CASE
+        WHEN event_name = 'viewed_homepage' THEN 'Homepage'
+        WHEN event_name = 'viewed_editor' THEN 'Editor'
+        ELSE 'Other'
+    END AS page_name
+FROM events
 
 -- Good too
-select
-    case
-        when event_name = 'viewed_homepage'
-            then 'Homepage'
-        when event_name = 'viewed_editor'
-            then 'Editor'
-        else 'Other'            
-    end as page_name
-from events
+SELECT
+    CASE
+        WHEN event_name = 'viewed_homepage'
+            THEN 'Homepage'
+        WHEN event_name = 'viewed_editor'
+            THEN 'Editor'
+        ELSE 'Other'            
+    END AS page_name
+FROM events
 
 -- Bad 
 select
@@ -671,28 +654,28 @@ Closing CTE parentheses should use the same indentation level as `with` and the 
 
 ```sql
 -- Good
-with ordered_details as (
+with ordered_details AS (
 
-    select
+    SELECT
         user_id,
         name,
-        row_number() over (partition by user_id order by date_updated desc) as details_rank
-    from billingdaddy.billing_stored_details
+        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY date_updated DESC) AS details_rank
+    FROM billingdaddy.billing_stored_details
 
 ),
 
-first_updates as (
+first_updates AS (
 
-    select 
+    SELECT
         user_id, 
         name
-    from ordered_details
-    where 
+    FROM ordered_details
+    WHERE 
         details_rank = 1
 
 )
 
-select * from first_updates
+SELECT * FROM first_updates
 
 -- Bad
 select 
@@ -713,7 +696,7 @@ where
 
 ```sql
 -- Good
-with ordered_details as (
+with ordered_details AS (
 
 -- Bad
 with d1 as (
@@ -725,21 +708,12 @@ Leave it all on its own line:
 
 ```sql
 -- Good
-select
+SELECT
     user_id,
     name,
-    row_number() over (partition by user_id order by date_updated desc) as details_rank
-from billingdaddy.billing_stored_details
+    ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY date_updated DESC) AS details_rank
+FROM billingdaddy.billing_stored_details
 
--- Okay
-select
-    user_id,
-    name,
-    row_number() over (
-        partition by user_id
-        order by date_updated desc
-    ) as details_rank
-from billingdaddy.billing_stored_details
 ```
 
 ## Credits
@@ -751,4 +725,4 @@ This style guide was inspired in part by:
 * [GitLab's SQL Style Guide](https://about.gitlab.com/handbook/business-ops/data-team/sql-style-guide/)
 * [Matt Mazur](https://mattmazur.com/)
 
-Hat-tip to Peter Butler, Dan Wyman, Simon Ouderkirk, Alex Cano, Adam Stone, Brian Kim, and Claire Carroll for providing feedback on this guide.
+
